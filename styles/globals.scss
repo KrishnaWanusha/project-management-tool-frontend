@@ -1,0 +1,52 @@
+/* purgecss start ignore */
+@tailwind base;
+@tailwind components;
+/* purgecss end ignore */
+@tailwind utilities;
+
+/* Skeleton loader */
+@-webkit-keyframes placeHolderShimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+@keyframes placeHolderShimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.skeleton {
+  color: rgba(0, 0, 0, 0);
+  -webkit-animation-duration: 1.25s;
+  animation-duration: 1.25s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-name: placeHolderShimmer;
+  animation-name: placeHolderShimmer;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+  background: #f6f6f6;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  position: relative;
+  .round {
+    border-radius: 50%;
+  }
+}
+
+.f-8 {
+  font-size: 10px;
+}
+.small-text {
+  font-size: 12px;
+}

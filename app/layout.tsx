@@ -1,5 +1,8 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
+"use client";
+
+import Layout from "@components/layout";
+import "../styles/globals.scss";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -7,7 +10,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Layout>{children}</Layout>
+      </body>
     </html>
   );
 }

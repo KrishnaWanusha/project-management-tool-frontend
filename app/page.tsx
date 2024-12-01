@@ -1,4 +1,5 @@
-import { buildRoute } from "@/helpers/global";
+"use client";
+import { buildRoute } from "@helpers/global";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
