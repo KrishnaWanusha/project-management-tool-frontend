@@ -63,16 +63,16 @@ const Layout = ({ children }: LayoutProps) => {
               Home
             </button>
             <button
+              onClick={() => router.push("/project-management")}
+              className="text-sm/6 font-semibold text-gray-900"
+            >
+              Project-Management
+            </button>
+            <button
               onClick={() => router.push(buildRoute("/upload"))}
               className="text-sm/6 font-semibold text-gray-900"
             >
               Generate
-            </button>
-            <button
-              onClick={() => router.push(buildRoute("/"))}
-              className="text-sm/6 font-semibold text-gray-900"
-            >
-              Marketplace
             </button>
             <button
               onClick={() => router.push(buildRoute("/"))}
@@ -107,8 +107,7 @@ const Layout = ({ children }: LayoutProps) => {
           ></div>
         </div>
 
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-          {/* The children passed to this layout will be rendered here */}
+        <div className="mx-auto max-w-7xl py-8 sm:py-12 lg:py-16">
           {children}
         </div>
 

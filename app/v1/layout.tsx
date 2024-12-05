@@ -1,6 +1,7 @@
 "use client";
 
-import "../styles/globals.scss";
+import Layout from "@components/layout";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -8,7 +9,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Layout>{children}</Layout>
+      </body>
     </html>
   );
 }
