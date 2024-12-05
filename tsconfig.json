@@ -25,6 +25,7 @@
       "@contexts/*": ["contexts/*"],
       "@helpers/*": ["helpers/*"],
       "@hooks/*": ["hooks/*"],
+      "@models/*": ["models/*"],
       "@services/*": ["services/*"],
       "@styles/*": ["styles/*"]
     }
