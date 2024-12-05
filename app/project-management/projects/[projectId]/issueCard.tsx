@@ -99,9 +99,6 @@ const IssueCard: React.FC<AppointmentCardProps> = ({ issue }) => {
             <span className="text-sm text-gray-600">{dayCount}</span>
           </div>
 
-          {/* Progress */}
-          <div className="text-sm text-gray-600">N/A%</div>
-
           {/* Menu */}
           <button className="p-1 rounded-full hover:bg-gray-100">
             <svg

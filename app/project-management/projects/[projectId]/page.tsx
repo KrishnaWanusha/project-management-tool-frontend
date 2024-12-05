@@ -40,7 +40,7 @@ const ProjectPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <ProjectDashboard project={state as Project} />
+        <ProjectDashboard project={state as Project} loading={loading} />
         <div className="flex justify-between">
           <div className="flex space-x-2">
             <ButtonComponent
@@ -74,9 +74,20 @@ const ProjectPage = () => {
           </div>
         </div>
         {loading ? (
-          <div className="h-screen flex items-center justify-center">
-            <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-gray-600" />
-          </div>
+          <>
+            <div className="py-4">
+              {[1, 2, 3, 4, 5].map((index) => (
+                <div
+                  key={index}
+                  className="w-full py-12 bg-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-300 mt-2 animate-pulse"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="py-4">
             {state?.issues?.map((issue) => (
