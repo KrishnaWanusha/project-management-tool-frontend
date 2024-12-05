@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/projects/page.tsx
 "use client";
-import React, { useEffect, useState } from "react";
-import { Project } from "@models/project";
+import React, { useState } from "react";
 import ProjectCard from "./projectCard";
 import ButtonComponent from "@components/button.component";
 import {
@@ -10,27 +10,14 @@ import {
   AdjustmentsHorizontalIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import { projects } from "@services/project";
+import { useGetProjects } from "@services/project";
 import CreateProjectModal from "./createProject";
+import moment from "moment";
 
 const ProjectsPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [state, setState] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await projects();
-        setState(data?.data?.projects);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProjects();
-  }, []);
+  const { data: state, loading, mutate } = useGetProjects();
 
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
@@ -65,15 +52,27 @@ const ProjectsPage = () => {
           </div>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {state?.map((project) => (
-              <ProjectCard key={project.displayId} project={project} />
-            ))}
+            {state?.projects
+              ?.slice()
+              .sort((a, b) =>
+                moment((b as any).created_at).isAfter(
+                  moment((a as any).created_at)
+                )
+                  ? 1
+                  : -1
+              )
+              .map((project) => (
+                <ProjectCard key={project.displayId} project={project} />
+              ))}
           </div>
         )}
 
         <CreateProjectModal
           isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            mutate();
+          }}
         />
       </div>
     </div>

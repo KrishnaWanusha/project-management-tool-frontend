@@ -1,6 +1,6 @@
 // app/projects/page.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Project } from "@models/project";
 import ButtonComponent from "@components/button.component";
 import {
@@ -10,37 +10,26 @@ import {
   PlusIcon,
   DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { get } from "@services/project";
 import { useParams } from "next/navigation";
 import IssueCard from "./issueCard";
 import ProjectDashboard from "./projectDashboard";
 import UploadModal from "./upload";
+import { useGetProject } from "@services/project";
 
 const ProjectPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [state, setState] = useState<Project>();
-  const [loading, setLoading] = useState<boolean>(true);
 
   const { projectId: id } = useParams();
 
-  useEffect(() => {
-    const loadProject = async (id: string) => {
-      try {
-        const data = await get(id);
-        setState(data?.data?.project);
-      } catch (error) {
-        console.error("Error fetching project data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProject(id as string);
-  }, [id]);
+  const { data: state, loading, mutate } = useGetProject(id as string);
 
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <ProjectDashboard project={state as Project} loading={loading} />
+        <ProjectDashboard
+          project={state?.project as Project}
+          loading={loading}
+        />
         <div className="flex justify-between">
           <div className="flex space-x-2">
             <ButtonComponent
@@ -90,7 +79,7 @@ const ProjectPage = () => {
           </>
         ) : (
           <div className="py-4">
-            {state?.issues?.map((issue) => (
+            {state?.project?.issues?.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}
           </div>
@@ -98,7 +87,10 @@ const ProjectPage = () => {
 
         <UploadModal
           isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            mutate();
+          }}
         />
       </div>
     </div>

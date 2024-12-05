@@ -118,7 +118,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
               <path d="M256 0C114.84 0 0 114.84 0 256s114.84 256 256 256 256-114.84 256-256S397.16 0 256 0zm0 470.487c-118.265 0-214.487-96.214-214.487-214.487 0-118.265 96.221-214.487 214.487-214.487 118.272 0 214.487 96.221 214.487 214.487 0 118.272-96.215 214.487-214.487 214.487z" />
             </svg>
             <h4 className="text-xl text-gray-800 font-semibold mt-4">
-              Project created Successfully!
+              Issues created Successfully!
             </h4>
             <ButtonComponent
               title="Close"
@@ -141,7 +141,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
               <circle cx="256" cy="370" r="24" />
             </svg>
             <h4 className="text-xl text-gray-800 font-semibold mt-4">
-              Project creation failed!
+              Issue creation failed!
             </h4>
             <p className="text-sm text-gray-500 leading-relaxed mt-4">
               {errorMessage || "Something went wrong!"}
