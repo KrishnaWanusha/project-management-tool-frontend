@@ -1,15 +1,14 @@
-// AppointmentCard.tsx
 import BadgeComponent from "@components/badge.component";
 import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { Issue } from "@models/issue";
 import moment from "moment-timezone";
 import React, { useMemo } from "react";
 
-interface AppointmentCardProps {
+interface IssueCardProps {
   issue: Issue;
 }
 
-const IssueCard: React.FC<AppointmentCardProps> = ({ issue }) => {
+const IssueCard: React.FC<IssueCardProps> = ({ issue }) => {
   const dayCount = useMemo(() => {
     const created = moment(issue.created_at ?? moment());
     const closed = moment(issue.closed_at ?? moment());

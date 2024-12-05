@@ -11,10 +11,10 @@ import {
   DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { get } from "@services/project";
-import CreateProjectModal from "../createProject";
 import { useParams } from "next/navigation";
 import IssueCard from "./issueCard";
 import ProjectDashboard from "./projectDashboard";
+import UploadModal from "./upload";
 
 const ProjectPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -96,7 +96,7 @@ const ProjectPage = () => {
           </div>
         )}
 
-        <CreateProjectModal
+        <UploadModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
         />

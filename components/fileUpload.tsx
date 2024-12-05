@@ -1,74 +1,41 @@
-import { buildRoute } from "@helpers/global";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 
-const FileUpload = () => {
-  const [meetingTitle, setMeetingTitle] = useState(""); // Meeting title state
-  const [file, setFile] = useState<File | null>(null); // Uploaded file state
-  const router = useRouter(); // Initialize useRouter
+type FileUploadProps = {
+  buttonTitle: string;
+  onSubmit: (file: File) => void;
+};
 
-  const handleTitleChange = (event: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
-    setMeetingTitle(event.target.value); // Update meeting title
-  };
+const FileUpload = ({ buttonTitle, onSubmit }: FileUploadProps) => {
+  const [file, setFile] = useState<File | null>(null); // Uploaded file state
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "audio/*": [], // Accept all audio file types
-      "video/*": [], // Accept all video file types
-    },
     onDrop: (acceptedFiles) => {
       setFile(acceptedFiles[0]); // Save the uploaded file
     },
   });
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-
-    if (!file) {
-      alert("Please upload a file.");
-      return;
-    }
-
-    // Simulate uploading the file
-    alert("File is being uploaded!");
-
-    // Redirect to the Processing page after file upload
-    router.push(buildRoute("/upload-meeting/processing"));
-  };
-
   return (
     <div className="flex items-center justify-center w-full">
-      <form className="w-full max-w-lg" onSubmit={handleSubmit}>
-        {/* Meeting Title */}
-        <div className="mb-4">
-          <label
-            htmlFor="meetingTitle"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Meeting Title
-          </label>
-          <input
-            type="text"
-            id="meetingTitle"
-            name="meetingTitle"
-            value={meetingTitle}
-            onChange={handleTitleChange}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Enter meeting title"
-          />
-        </div>
-
+      <form
+        className="w-full max-w-lg"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!file) {
+            alert("Please upload a file.");
+            return;
+          }
+          onSubmit(file);
+        }}
+      >
         {/* File Upload */}
         <label
           htmlFor="dropzone-file"
           className="flex flex-col items-center justify-center w-full h-64 border-4 border-dashed border-indigo-500 rounded-xl cursor-pointer bg-indigo-50 hover:bg-indigo-100 focus:ring-4 focus:ring-indigo-300"
         >
           <div
-            {...getRootProps()}
+            {...getRootProps({
+              onClick: (event) => event.stopPropagation(), // Prevent duplicate triggers
+            })}
             className="flex flex-col items-center justify-center pt-5 pb-6"
           >
             <svg
@@ -89,7 +56,7 @@ const FileUpload = () => {
               <span className="text-indigo-800">Click or drag</span> to upload
             </p>
             <p className="text-xs text-indigo-600">
-              MP3, MP4, WAV, or other audio/video files
+              All the file types are accepted
             </p>
           </div>
           <input
@@ -116,7 +83,7 @@ const FileUpload = () => {
             type="submit"
             className="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-indigo-500"
           >
-            Upload and Generate Document
+            {buttonTitle}
           </button>
         </div>
       </form>
