@@ -14,7 +14,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   return (
     <div
       onClick={() =>
-        router.push(`/project-management/projects/${project.displayId}`)
+        router.push(
+          `/project-management/projects/${project.displayId}/documents`
+        )
       }
       className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200 cursor-pointer flex"
     >

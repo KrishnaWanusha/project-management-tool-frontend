@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import {
   HomeIcon,
   FolderIcon,
@@ -13,6 +13,7 @@ import {
 const SideNav = () => {
   // const [isProjectsExpanded, setProjectsExpanded] = useState(false);
   const routerPath = usePathname();
+  const params = useParams();
 
   // const toggleProjects = () => {
   //   setProjectsExpanded((prev) => !prev);
@@ -20,10 +21,7 @@ const SideNav = () => {
 
   // Function to check if the current URL matches the given path
   const isActiveLink = (path: string) => {
-    const regex = /\/project-management\/([^\/]+)/;
-    const match1 = routerPath.match(regex)?.[1];
-    const match2 = path.match(regex)?.[1];
-    return `${match1}` === match2
+    return routerPath === path
       ? "bg-gradient-to-r from-indigo-500 to-indigo-700 text-white"
       : "text-gray-700";
   };
@@ -59,7 +57,46 @@ const SideNav = () => {
               <FolderIcon className="w-5 h-5 mr-3" />
               Projects
             </Link>
-
+            {params?.projectId && (
+              <>
+                <Link
+                  href={`/project-management/projects/${params.projectId}/documents`}
+                  className={`flex items-center px-2 py-2 rounded-md hover:bg-gray-100 ${isActiveLink(
+                    `/project-management/projects/${params.projectId}/documents`
+                  )}`}
+                >
+                  <FolderIcon className="w-5 h-5 mr-3" />
+                  Document Generation
+                </Link>
+                <Link
+                  href={`/project-management/projects/${params.projectId}/tasks`}
+                  className={`flex items-center px-2 py-2 rounded-md hover:bg-gray-100 ${isActiveLink(
+                    `/project-management/projects/${params.projectId}/tasks`
+                  )}`}
+                >
+                  <FolderIcon className="w-5 h-5 mr-3" />
+                  Task Management
+                </Link>
+                <Link
+                  href={`/project-management/projects/${params.projectId}/risk`}
+                  className={`flex items-center px-2 py-2 rounded-md hover:bg-gray-100 ${isActiveLink(
+                    `/project-management/projects/${params.projectId}/risk`
+                  )}`}
+                >
+                  <FolderIcon className="w-5 h-5 mr-3" />
+                  Risk Assessment
+                </Link>
+                <Link
+                  href={`/project-management/projects/${params.projectId}/skills`}
+                  className={`flex items-center px-2 py-2 rounded-md hover:bg-gray-100 ${isActiveLink(
+                    `/project-management/projects/${params.projectId}/skills`
+                  )}`}
+                >
+                  <FolderIcon className="w-5 h-5 mr-3" />
+                  Skill Assessment
+                </Link>
+              </>
+            )}
             <Link
               href="/team"
               className={`flex items-center px-2 py-2 rounded-md hover:bg-gray-100 ${isActiveLink(
