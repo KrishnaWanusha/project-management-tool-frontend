@@ -6,7 +6,7 @@ const ProjectPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("project-management/dashboard");
+    router.replace("project-management/prAnalysis");
   }, []);
   return <></>;
 };

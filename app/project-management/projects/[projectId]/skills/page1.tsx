@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  const params = useParams()
 
   const handleLogin = () => {
     // Redirect to GitHub login
@@ -12,7 +13,7 @@ export default function Home() {
 
     // Set a timeout to navigate to dashboard after 10 seconds
     setTimeout(() => {
-      router.push("project-management/prAnalysis");
+      router.push(`project-management/projcts/${params?.projectId}/prAnalysis`);
     }, 10000); // 10 seconds delay
   };
 
