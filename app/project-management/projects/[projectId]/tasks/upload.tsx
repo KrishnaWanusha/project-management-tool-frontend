@@ -3,46 +3,62 @@ import Modal from "@components/modal.component";
 import { useCallback, useState } from "react";
 import PreviewCard from "./previewCard";
 import ButtonComponent from "@components/button.component";
-import { createIssues, SRSUploadRequest } from "@services/issues";
+import {
+  createIssues,
+  SRSUploadRequest,
+  uploadSRSFile,
+} from "@services/issues";
 import Processing from "@components/processing";
 import axios from "axios";
+import { Project } from "@models/project";
+import ProcessingModal from "@components/processing";
 
 type UploadModalProps = {
   isOpen: boolean;
+  info?: Project;
   onClose: () => void;
 };
 
 type ModalState = "upload" | "preview" | "processing" | "success" | "error";
 
-export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
+export default function UploadModal({
+  isOpen,
+  info,
+  onClose,
+}: UploadModalProps) {
   const [state, setState] = useState<SRSUploadRequest | null>(null);
   const [modalState, setModalState] = useState<ModalState>("upload");
   const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const onUpload = useCallback((file: File) => {
-    if (file.type === "application/json") {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result as string);
-          setState(data);
+  const [loading, setLoading] = useState<boolean>(false);
+  const onUpload = useCallback(
+    async (file: File) => {
+      try {
+        setLoading(true);
+        const response = await uploadSRSFile(file);
+        if (response?.data?.tasks?.length > 0) {
           setModalState("preview");
-        } catch (error) {
-          console.log("error", error);
-          setErrorMessage("Failed to parse JSON file");
+          setState({
+            repo: info?.repo ?? "",
+            owner: info?.owner ?? "",
+            issues: response?.data?.tasks?.map((m) => ({
+              title: m.requirement,
+              body: m.tasks?.join("\n"),
+            })),
+          });
+        } else {
+          setErrorMessage("Failed to upload the SRS file");
           setModalState("error");
         }
-      };
-      reader.onerror = () => {
-        setErrorMessage("Error reading the file");
+      } catch (err) {
+        console.error(err);
+        setErrorMessage("Error uploading the SRS file");
         setModalState("error");
-      };
-      reader.readAsText(file);
-    } else {
-      setErrorMessage("Invalid file type. Please upload a JSON file");
-      setModalState("error");
-    }
-  }, []);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [info?.owner, info?.repo]
+  );
 
   const onSubmit = useCallback(async () => {
     if (state) {
@@ -77,10 +93,16 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       case "upload":
         return (
           <>
-            <h1 className="text-xl font-semibold text-center mb-6">
-              Upload SRS Document
-            </h1>
-            <FileUpload buttonTitle="Upload Document" onSubmit={onUpload} />
+            {!loading ? (
+              <>
+                <h1 className="text-xl font-semibold text-center mb-6">
+                  Upload SRS Document
+                </h1>
+                <FileUpload buttonTitle="Upload Document" onSubmit={onUpload} />
+              </>
+            ) : (
+              <ProcessingModal />
+            )}
           </>
         );
 
@@ -90,10 +112,12 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
             <h1 className="text-xl font-semibold text-center mb-6">
               Preview Issues
             </h1>
-            {state?.issues?.map((issue, index) => (
-              <PreviewCard key={index} issue={issue} />
-            ))}
-            <div className="flex justify-center pt-4 w-full">
+            <div className="max-h-80 overflow-y-auto px-2">
+              {state?.issues?.map((issue, index) => (
+                <PreviewCard key={index} issue={issue} />
+              ))}
+            </div>
+            <div className="flex justify-center pt-4 w-full sticky bottom-0 bg-white p-4">
               <ButtonComponent
                 title="Submit"
                 onClick={onSubmit}

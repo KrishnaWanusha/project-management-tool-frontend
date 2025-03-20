@@ -3,8 +3,8 @@ import { AxiosResponse } from "axios";
 
 export type PreviewIssue = {
   title: string;
-  body: string;
-  labels: string[];
+  body?: string;
+  labels?: string[];
 };
 
 export type SRSUploadRequest = {
@@ -21,6 +21,23 @@ export const createIssues = (data: SRSUploadRequest) => {
     responseType: "json",
     headers: {
       "Content-Type": "application/json",
+    },
+  });
+};
+
+export const uploadSRSFile = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axiosInstance().post<
+    FormData,
+    AxiosResponse<{
+      success: boolean;
+      tasks: { requirement: string; tasks: string[] }[];
+    }>
+  >(`/issues/srs/upload`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
   });
 };
