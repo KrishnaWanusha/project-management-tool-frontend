@@ -11,8 +11,11 @@ export function buildRoute(path: string, query?: { [key: string]: any }) {
     }
     route += `?${params.toString()}`;
   }
-  console.log("route", route);
   return route;
+}
+
+export function buildV2Route(path: string) {
+  return `/v2/${path}`;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

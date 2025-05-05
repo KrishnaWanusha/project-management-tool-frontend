@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, {
@@ -12,11 +13,10 @@ import React, {
 
 import { clearInstance } from "@/helpers/axiosInstance.c";
 import { createCustomSetStateFn, loadLocalStorage } from "@/helpers/global.c";
-import { LoginResponse } from "@/services/login";
 
 type AuthContextType = {
-  user?: LoginResponse;
-  setUser: Dispatch<SetStateAction<LoginResponse | undefined>>;
+  user?: any;
+  setUser: Dispatch<SetStateAction<any | undefined>>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<LoginResponse | undefined>();
+  const [user, setUser] = useState<any | undefined>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
