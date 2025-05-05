@@ -21,7 +21,7 @@ export interface GitHubUser {
   email: string;
 }
 
-export type DashboardSection = 
+export type DashboardSection =
   | "document-generation"
   | "task-creation"
   | "risk-assessment"
@@ -31,5 +31,5 @@ export const DASHBOARD_SECTIONS: { id: DashboardSection; label: string }[] = [
   { id: "document-generation", label: "Document Generation" },
   { id: "task-creation", label: "Task Creation" },
   { id: "risk-assessment", label: "Risk Assessment" },
-  { id: "skill-assessment", label: "Skill Assessment" }
+  { id: "skill-assessment", label: "Skill Assessment" },
 ];

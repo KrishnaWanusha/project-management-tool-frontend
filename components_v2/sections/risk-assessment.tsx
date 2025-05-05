@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components_v2/ui/card";
 import { Button } from "@/components_v2/ui/button";
-import { Progress } from "@/components_v2/ui/progress";
 import {
   AlertTriangle,
   HelpCircle,
@@ -62,7 +61,6 @@ export function RiskAssessment() {
               <span className="text-sm font-medium">Current Score</span>
               <span className="text-sm font-medium">62/100</span>
             </div>
-            <Progress value={62} className="h-2" />
 
             <div className="flex flex-col sm:flex-row gap-4 text-center mt-4">
               <div className="flex-1 p-3 border rounded-md">

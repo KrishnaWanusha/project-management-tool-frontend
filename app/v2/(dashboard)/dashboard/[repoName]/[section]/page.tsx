@@ -8,9 +8,8 @@ import { TaskCreation } from "@/components_v2/sections/task-creation";
 import { RiskAssessment } from "@/components_v2/sections/risk-assessment";
 import { SkillAssessment } from "@/components_v2/sections/skill-assessment";
 import { DashboardSection } from "@/types/github";
-import { buildV2Route } from "@helpers/global";
 
-export default function DashboardPage({
+function DashboardPage({
   params,
 }: {
   params: { repoName: string; section: string };
@@ -21,7 +20,7 @@ export default function DashboardPage({
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push(buildV2Route("/login"));
+      router.push("/v2/login");
     }
   }, [status, router]);
 
@@ -57,3 +56,5 @@ export default function DashboardPage({
     </div>
   );
 }
+
+export default DashboardPage;

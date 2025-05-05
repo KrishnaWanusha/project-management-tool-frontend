@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components_v2/ui/card";
 import { Button } from "@/components_v2/ui/button";
-import { Progress } from "@/components_v2/ui/progress";
 import { BookOpenCheck, Award, Users, FileSpreadsheet } from "lucide-react";
 import {
   PieChart,
@@ -56,7 +55,7 @@ export function SkillAssessment() {
                       {skill.value}%
                     </span>
                   </div>
-                  <Progress
+                  {/* <Progress
                     value={skill.value}
                     className="h-2"
                     style={
@@ -64,7 +63,7 @@ export function SkillAssessment() {
                         "--theme-primary": skill.color,
                       } as React.CSSProperties
                     }
-                  />
+                  /> */}
                 </div>
               ))}
             </div>

@@ -13,9 +13,7 @@ const FileUploadPage = () => {
   }) => {
     setMeetingTitle(event.target.value); // Update meeting title
   };
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-
+  const handleSubmit = async () => {
     // Simulate uploading the file
     alert("File is being uploaded!");
 

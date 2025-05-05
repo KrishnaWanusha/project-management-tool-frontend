@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 
 type FileUploadProps = {
   buttonTitle: string;
-  onSubmit: (file: File) => void;
+  onSubmit: (e: File) => void;
 };
 
 const FileUpload = ({ buttonTitle, onSubmit }: FileUploadProps) => {
