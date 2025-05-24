@@ -44,7 +44,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
           <Link href="/" className="flex items-center gap-2">
             <GitHubLogoIcon className="h-6 w-6" />
             <span className="font-semibold text-xl hidden sm:inline-block">
-              ProjectHub
+              Vortexa
             </span>
           </Link>
         </div>

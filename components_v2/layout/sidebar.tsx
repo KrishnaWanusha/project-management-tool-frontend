@@ -26,9 +26,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const params = useParams<{ repoName: string; section: string }>();
+  const params = useParams<{
+    repoName: string;
+    owner: string;
+    section: string;
+  }>();
   const currentRepo = params.repoName;
   const currentSection = params.section;
+  const repoOwner = params.owner;
 
   return (
     <>
@@ -64,7 +69,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Link
               key={section.id}
               href={
-                currentRepo ? `/v2/dashboard/${currentRepo}/${section.id}` : "#"
+                currentRepo
+                  ? `/v2/dashboard/${currentRepo}/${repoOwner}/${section.id}`
+                  : "#"
               }
               className={cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",

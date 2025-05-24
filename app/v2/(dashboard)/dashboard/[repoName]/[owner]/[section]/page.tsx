@@ -12,11 +12,11 @@ import { DashboardSection } from "@/types/github";
 function DashboardPage({
   params,
 }: {
-  params: { repoName: string; section: string };
+  params: { repoName: string; owner: string; section: string };
 }) {
   const { status } = useSession();
   const router = useRouter();
-  const { section } = params;
+  const { owner, section } = params;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -29,7 +29,7 @@ function DashboardPage({
       case "document-generation":
         return <DocumentGeneration />;
       case "task-creation":
-        return <TaskCreation />;
+        return <TaskCreation repoName={params.repoName} owner={owner} />;
       case "risk-assessment":
         return <RiskAssessment />;
       case "skill-assessment":

@@ -7,59 +7,93 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components_v2/ui/card";
-import { GitForkIcon, StarIcon, LockIcon } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { GitForkIcon, StarIcon, EyeIcon } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components_v2/ui/badge";
 
 interface RepositoryCardProps {
   repository: Repository;
   className?: string;
 }
 
-export function RepositoryCard({ repository, className }: RepositoryCardProps) {
+// Helper to format dates
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+};
+
+// Language color map
+const languageColors: Record<string, string> = {
+  JavaScript: "bg-yellow-400",
+  TypeScript: "bg-blue-500",
+  Python: "bg-green-500",
+  Java: "bg-red-500",
+  Go: "bg-blue-400",
+  Rust: "bg-orange-500",
+  "C++": "bg-pink-500",
+  C: "bg-gray-500",
+  "C#": "bg-purple-500",
+  Ruby: "bg-red-600",
+  PHP: "bg-indigo-400",
+  HTML: "bg-orange-600",
+  CSS: "bg-blue-600",
+  Shell: "bg-green-600",
+  default: "bg-gray-400",
+};
+
+export function RepositoryCard({ repository }: RepositoryCardProps) {
   return (
-    <Link href={`/v2/dashboard/${repository.name}/document-generation`}>
-      <Card
-        className={cn(
-          "h-full transition-all hover:border-primary/50 hover:shadow-md",
-          className
-        )}
-      >
+    <Link
+      href={`/v2/dashboard/${repository.name}/${repository.owner.login}/document-generation`}
+    >
+      <Card className="h-full overflow-hidden hover:shadow-md transition-shadow duration-200">
         <CardHeader className="pb-2">
-          <div className="flex items-start justify-between">
-            <CardTitle className="text-xl font-bold line-clamp-1">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-xl font-semibold truncate">
               {repository.name}
             </CardTitle>
-            {repository.private && (
-              <LockIcon className="h-4 w-4 text-muted-foreground" />
-            )}
+            {repository.private ? (
+              <Badge variant="outline">Private</Badge>
+            ) : null}
           </div>
           <CardDescription className="line-clamp-2 h-10">
             {repository.description || "No description provided"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">
-            {repository.owner.login}
-          </div>
+        <CardContent className="pb-2">
+          {repository.language ? (
+            <div className="flex items-center gap-1">
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  languageColors[repository.language] || languageColors.default
+                }`}
+              />
+              <span className="text-xs text-muted-foreground">
+                {repository.language}
+              </span>
+            </div>
+          ) : null}
         </CardContent>
-        <CardFooter className="text-xs text-muted-foreground">
-          <div className="flex w-full justify-between">
-            <span>
-              Updated {formatDistanceToNow(new Date(repository.updated_at))} ago
-            </span>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center">
-                <StarIcon className="mr-1 h-3.5 w-3.5" />
-                <span>0</span>
-              </div>
-              <div className="flex items-center">
-                <GitForkIcon className="mr-1 h-3.5 w-3.5" />
-                <span>0</span>
-              </div>
+        <CardFooter className="flex justify-between text-xs text-muted-foreground pt-0">
+          <div className="flex space-x-4">
+            <div className="flex items-center">
+              <StarIcon className="h-3.5 w-3.5 mr-1" />
+              <span>{repository.stargazers_count}</span>
+            </div>
+            <div className="flex items-center">
+              <GitForkIcon className="h-3.5 w-3.5 mr-1" />
+              <span>{repository.forks_count}</span>
+            </div>
+            <div className="flex items-center">
+              <EyeIcon className="h-3.5 w-3.5 mr-1" />
+              <span>{repository.watchers_count}</span>
             </div>
           </div>
+          <div>Updated {formatDate(repository.updated_at)}</div>
         </CardFooter>
       </Card>
     </Link>
