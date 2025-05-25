@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -5,32 +6,157 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components_v2/ui/card";
-import { Button } from "@/components_v2/ui/button";
-import { BookOpenCheck, Award, Users, FileSpreadsheet } from "lucide-react";
+import { Activity, GitPullRequest, LineChart } from "lucide-react";
 import {
+  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  ResponsiveContainer,
   Legend,
   Tooltip,
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
 } from "recharts";
+import { useSession } from "next-auth/react";
+import { analyzeRepository } from "@/lib/pr-analyze";
 
-const SKILLS_DATA = [
-  { name: "JavaScript", value: 65, color: "#f1c40f" },
-  { name: "TypeScript", value: 45, color: "#3498db" },
-  { name: "React", value: 55, color: "#1abc9c" },
-  { name: "Node.js", value: 30, color: "#27ae60" },
-  { name: "HTML/CSS", value: 75, color: "#e74c3c" },
-];
+type Metrics = {
+  cbo: number;
+  cboModified: number;
+  fanin: number;
+  fanout: number;
+  wmc: number;
+  dit: number;
+  noc: number;
+  rfc: number;
+  lcom: number;
+  lcom_star: number;
+  tcc: number;
+  loc: number;
+  returnQty: number;
+  loopQty: number;
+  comparisonsQty: number;
+  tryCatchQty: number;
+  stringLiteralsQty: number;
+  numbersQty: number;
+  assignmentsQty: number;
+  mathOperationsQty: number;
+  variablesQty: number;
+  maxNestedBlocksQty: number;
+};
 
-export function SkillAssessment() {
+type PullRequest = {
+  pr_number: number;
+  title: string;
+  unsupported_files: string[];
+  quality_score: number | string;
+  ml_prediction: string;
+  metrics?: Metrics;
+};
+
+export function SkillAssessment({
+  repoName,
+  owner,
+}: {
+  repoName: string;
+  owner: string;
+}) {
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+  const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
+
+  const analyse = useCallback(async () => {
+    if (!session?.accessToken) return;
+    setIsLoading(true);
+    try {
+      const data = await analyzeRepository(
+        session.accessToken,
+        owner,
+        repoName
+      );
+      setPullRequests(
+        Array.isArray(data?.pull_requests) ? data?.pull_requests : []
+      );
+    } catch (error) {
+      console.error("Error fetching GitHub issues:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [session?.accessToken, owner, repoName]);
+
+  useEffect(() => {
+    analyse();
+  }, [analyse]);
+
+  const analyzedPRs = useMemo(
+    () => pullRequests.filter((pr) => typeof pr.quality_score === "number"),
+    [pullRequests]
+  );
+
+  const qualityDistribution = useMemo(() => {
+    const total = analyzedPRs.length;
+    const good = analyzedPRs.filter((pr) => pr.ml_prediction === "Good").length;
+    return [
+      { name: "Good", value: (good / total) * 100, color: "#10b981" },
+      {
+        name: "Needs Improvement",
+        value: ((total - good) / total) * 100,
+        color: "#f59e0b",
+      },
+    ];
+  }, [analyzedPRs]);
+
+  const complexityTrend = useMemo(
+    () =>
+      analyzedPRs.map((pr) => ({
+        pr: `PR-${pr.pr_number}`,
+        complexity: pr.metrics?.cbo || 0,
+        loc: pr.metrics?.loc || 0,
+        quality: typeof pr.quality_score === "number" ? pr.quality_score : 0,
+      })),
+    [analyzedPRs]
+  );
+
+  const averageMetrics = useMemo(() => {
+    if (analyzedPRs.length === 0) return null;
+
+    const metrics = analyzedPRs.reduce(
+      (acc, pr) => {
+        if (!pr.metrics) return acc;
+        return {
+          loc: acc.loc + pr.metrics.loc,
+          complexity: acc.complexity + pr.metrics.cboModified,
+          variables: acc.variables + pr.metrics.variablesQty,
+        };
+      },
+      { loc: 0, complexity: 0, variables: 0 }
+    );
+
+    return {
+      loc: Math.round(metrics.loc / analyzedPRs.length),
+      complexity: Math.round(metrics.complexity / analyzedPRs.length),
+      variables: Math.round(metrics.variables / analyzedPRs.length),
+    };
+  }, [analyzedPRs]);
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-10 text-muted-foreground">
+        Loading analysis...
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight">Skill Assessment</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Pull Request Analysis
+        </h2>
         <p className="text-muted-foreground">
-          Analyze skills required for your project and team competencies
+          Code quality and complexity metrics across pull requests
         </p>
       </div>
 
@@ -38,34 +164,16 @@ export function SkillAssessment() {
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Required Skills</CardTitle>
-              <Award className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Analysis Coverage</CardTitle>
+              <GitPullRequest className="h-5 w-5 text-muted-foreground" />
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Based on repository analysis
-            </p>
-            <div className="space-y-4">
-              {SKILLS_DATA.map((skill) => (
-                <div key={skill.name} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{skill.name}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {skill.value}%
-                    </span>
-                  </div>
-                  {/* <Progress
-                    value={skill.value}
-                    className="h-2"
-                    style={
-                      {
-                        "--theme-primary": skill.color,
-                      } as React.CSSProperties
-                    }
-                  /> */}
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center h-[200px]">
+              <div className="text-4xl font-bold">
+                {analyzedPRs.length}/{pullRequests.length}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">PRs Analyzed</p>
             </div>
           </CardContent>
         </Card>
@@ -73,34 +181,31 @@ export function SkillAssessment() {
         <Card className="md:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Skill Distribution</CardTitle>
-              <FileSpreadsheet className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Quality Distribution</CardTitle>
+              <Activity className="h-5 w-5 text-muted-foreground" />
             </div>
-            <CardDescription>Breakdown of technical skills</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px]">
+            <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={SKILLS_DATA}
+                    data={qualityDistribution}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     outerRadius={80}
-                    fill="#8884d8"
                     dataKey="value"
                   >
-                    {SKILLS_DATA.map((entry, index) => (
+                    {qualityDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => [`${value}%`, "Required Level"]}
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                    }}
+                    formatter={(value) => [
+                      `${Math.round(value as number)}%`,
+                      "Percentage",
+                    ]}
                   />
                   <Legend />
                 </PieChart>
@@ -113,27 +218,78 @@ export function SkillAssessment() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Team Assessment</CardTitle>
-            <Users className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Quality Trends</CardTitle>
+            <LineChart className="h-5 w-5 text-muted-foreground" />
           </div>
           <CardDescription>
-            Compare required skills with team capabilities
+            Quality score and complexity over time
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-6">
-            Upload your team&apos;s skill profile to identify gaps and training
-            opportunities
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button>
-              <BookOpenCheck className="mr-2 h-4 w-4" />
-              Generate Skill Report
-            </Button>
-            <Button variant="outline">Upload Team Profile</Button>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsLineChart data={complexityTrend}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="pr" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="quality"
+                  stroke="#10b981"
+                  name="Quality Score"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="complexity"
+                  stroke="#f59e0b"
+                  name="Complexity"
+                />
+              </RechartsLineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
+
+      {averageMetrics && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">
+                Avg. Lines of Code
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{averageMetrics.loc}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">
+                Avg. Complexity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {averageMetrics.complexity}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">
+                Avg. Variables
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {averageMetrics.variables}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

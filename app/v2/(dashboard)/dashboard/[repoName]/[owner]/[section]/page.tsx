@@ -33,7 +33,7 @@ function DashboardPage({
       case "risk-assessment":
         return <RiskAssessment />;
       case "skill-assessment":
-        return <SkillAssessment />;
+        return <SkillAssessment owner={owner} repoName={params.repoName} />;
       default:
         return <DocumentGeneration />;
     }
