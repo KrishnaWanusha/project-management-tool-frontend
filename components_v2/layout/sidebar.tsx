@@ -60,9 +60,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <div className="flex flex-col space-y-1">
           <p className="text-sm font-medium text-muted-foreground mb-2">
-            {currentRepo
-              ? decodeURIComponent(currentRepo)
-              : "Select Repository"}
+            {currentRepo ? (
+  <div className="mb-4">
+    <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
+      Repository
+    </p>
+    <div className="text-base font-semibold text-white truncate">
+      {decodeURIComponent(currentRepo)}
+    </div>
+  </div>
+) : (
+  <div className="mb-4">
+    <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
+      Repository
+    </p>
+    <div className="text-sm text-gray-400">Not selected</div>
+  </div>
+)}
+
           </p>
 
           {DASHBOARD_SECTIONS.map((section) => (
