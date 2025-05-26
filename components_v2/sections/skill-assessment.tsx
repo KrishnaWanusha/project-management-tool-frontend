@@ -22,64 +22,57 @@ import {
 } from "recharts";
 import { useSession } from "next-auth/react";
 import { analyzeRepository } from "@/lib/pr-analyze";
+import clsx from "clsx";
 
-type Metrics = {
-  cbo: number;
-  cboModified: number;
-  fanin: number;
-  fanout: number;
-  wmc: number;
-  dit: number;
-  noc: number;
-  rfc: number;
-  lcom: number;
-  lcom_star: number;
-  tcc: number;
-  loc: number;
-  returnQty: number;
-  loopQty: number;
-  comparisonsQty: number;
-  tryCatchQty: number;
-  stringLiteralsQty: number;
-  numbersQty: number;
-  assignmentsQty: number;
-  mathOperationsQty: number;
-  variablesQty: number;
-  maxNestedBlocksQty: number;
+const metricLabels = {
+  cbo: "Coupling Between Objects",
+  cboModified: "Modified Coupling",
+  fanin: "Fan-In (Incoming Calls)",
+  fanout: "Fan-Out (Outgoing Calls)",
+  wmc: "Weighted Methods per Class",
+  dit: "Depth of Inheritance Tree",
+  noc: "Number of Children",
+  rfc: "Response for a Class",
+  lcom: "Lack of Cohesion (LCOM)",
+  lcom_star: "Normalized LCOM",
+  tcc: "Tight Class Cohesion",
+  loc: "Lines of Code",
+  returnQty: "Return Statements",
+  loopQty: "Loop Count",
+  comparisonsQty: "Comparison Operators",
+  tryCatchQty: "Try-Catch Blocks",
+  stringLiteralsQty: "String Literals",
+  numbersQty: "Numeric Literals",
+  assignmentsQty: "Assignment Operations",
+  mathOperationsQty: "Math Operations",
+  variablesQty: "Declared Variables",
+  maxNestedBlocksQty: "Max Nested Blocks",
 };
 
-type PullRequest = {
-  pr_number: number;
-  title: string;
-  unsupported_files: string[];
-  quality_score: number | string;
-  ml_prediction: string;
-  metrics?: Metrics;
-};
+function renderMetricCard(key: keyof typeof metricLabels, value: number) {
+  const label = metricLabels[key] || key;
+  return (
+    <div
+      key={key}
+      className="transition-all duration-300 hover:scale-105 hover:bg-gradient-to-br hover:from-indigo-500 hover:to-purple-500 hover:text-white rounded-2xl shadow-lg p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 cursor-pointer"
+    >
+      <div className="text-sm font-semibold mb-1">{label}</div>
+      <div className="text-xl font-bold">{value}</div>
+    </div>
+  );
+}
 
-export function SkillAssessment({
-  repoName,
-  owner,
-}: {
-  repoName: string;
-  owner: string;
-}) {
+export function SkillAssessment({ repoName, owner }: { repoName: string; owner: string }) {
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
-  const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
+  const [pullRequests, setPullRequests] = useState<any[]>([]);
 
   const analyse = useCallback(async () => {
     if (!session?.accessToken) return;
     setIsLoading(true);
     try {
-      const data = await analyzeRepository(
-        session.accessToken,
-        owner,
-        repoName
-      );
-      setPullRequests(
-        Array.isArray(data?.pull_requests) ? data?.pull_requests : []
-      );
+      const data = await analyzeRepository(session.accessToken, owner, repoName);
+      setPullRequests(Array.isArray(data?.pull_requests) ? data?.pull_requests : []);
     } catch (error) {
       console.error("Error fetching GitHub issues:", error);
     } finally {
@@ -98,6 +91,7 @@ export function SkillAssessment({
 
   const qualityDistribution = useMemo(() => {
     const total = analyzedPRs.length;
+    if (total === 0) return [];
     const good = analyzedPRs.filter((pr) => pr.ml_prediction === "Good").length;
     return [
       { name: "Good", value: (good / total) * 100, color: "#10b981" },
@@ -122,7 +116,6 @@ export function SkillAssessment({
 
   const averageMetrics = useMemo(() => {
     if (analyzedPRs.length === 0) return null;
-
     const metrics = analyzedPRs.reduce(
       (acc, pr) => {
         if (!pr.metrics) return acc;
@@ -134,7 +127,6 @@ export function SkillAssessment({
       },
       { loc: 0, complexity: 0, variables: 0 }
     );
-
     return {
       loc: Math.round(metrics.loc / analyzedPRs.length),
       complexity: Math.round(metrics.complexity / analyzedPRs.length),
@@ -144,50 +136,40 @@ export function SkillAssessment({
 
   if (isLoading) {
     return (
-      <div className="text-center py-10 text-muted-foreground">
-        Loading analysis...
+      <div className="text-center py-10 text-muted-foreground animate-pulse">
+        Analyzing repository...
       </div>
     );
   }
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Pull Request Analysis
-        </h2>
-        <p className="text-muted-foreground">
-          Code quality and complexity metrics across pull requests
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Analysis Coverage</CardTitle>
-              <GitPullRequest className="h-5 w-5 text-muted-foreground" />
-            </div>
+const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-white/30 shadow-sm";
+
+
+  return (
+    <div className="space-y-10 px-4">
+      <div className="text-left space-y-1">
+  <h2 className="text-4xl font-extrabold tracking-tight">Pull Request Analysis</h2>
+  <p className="text-muted-foreground text-lg">Visual insights into code quality and complexity trends</p>
+</div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card className={cardClass}>
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2"><GitPullRequest /> Analysis Coverage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center h-[200px]">
-              <div className="text-4xl font-bold">
-                {analyzedPRs.length}/{pullRequests.length}
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">PRs Analyzed</p>
-            </div>
+            <div className="text-5xl font-bold text-center">{analyzedPRs.length}/{pullRequests.length}</div>
+            <p className="text-center text-muted-foreground mt-1">Pull Requests Analyzed</p>
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Quality Distribution</CardTitle>
-              <Activity className="h-5 w-5 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
+        {qualityDistribution.length > 0 && (
+          <Card className={`md:col-span-2 ${cardClass}`}>
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2"><Activity /> Quality Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
                     data={qualityDistribution}
@@ -201,93 +183,69 @@ export function SkillAssessment({
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    formatter={(value) => [
-                      `${Math.round(value as number)}%`,
-                      "Percentage",
-                    ]}
-                  />
+                  <Tooltip formatter={(value) => [`${Math.round(value as number)}%`, "Percentage"]} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      <Card>
+      <Card className={cardClass}>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Quality Trends</CardTitle>
-            <LineChart className="h-5 w-5 text-muted-foreground" />
-          </div>
-          <CardDescription>
-            Quality score and complexity over time
-          </CardDescription>
+          <CardTitle className="text-xl flex items-center gap-2"><LineChart /> Quality Trends</CardTitle>
+          <CardDescription>Track how quality and complexity change over time</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsLineChart data={complexityTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="pr" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="quality"
-                  stroke="#10b981"
-                  name="Quality Score"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="complexity"
-                  stroke="#f59e0b"
-                  name="Complexity"
-                />
-              </RechartsLineChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <RechartsLineChart data={complexityTrend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="pr" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="quality" stroke="#10b981" name="Quality Score" />
+              <Line type="monotone" dataKey="complexity" stroke="#f59e0b" name="Complexity" />
+            </RechartsLineChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
 
       {averageMetrics && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                Avg. Lines of Code
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{averageMetrics.loc}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                Avg. Complexity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {averageMetrics.complexity}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                Avg. Variables
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {averageMetrics.variables}
-              </div>
-            </CardContent>
-          </Card>
+          <Card className={cardClass}><CardHeader><CardTitle>💻 Average Lines of Code</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.loc}</div></CardContent></Card>
+          <Card className={cardClass}><CardHeader><CardTitle>📈 Average Complexity</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.complexity}</div></CardContent></Card>
+          <Card className={cardClass}><CardHeader><CardTitle>📎 Average Variables</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.variables}</div></CardContent></Card>
+        </div>
+      )}
+
+      {analyzedPRs.length > 0 && (
+        <div className="space-y-6">
+          <h3 className="text-2xl font-bold"> Detailed PR Metrics</h3>
+          {analyzedPRs.map((pr) => (
+            <Card key={pr.pr_number} className={cardClass}>
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">PR #{pr.pr_number}: {pr.title}</CardTitle>
+                <CardDescription>
+                  Quality Score: <span className="font-bold">
+                    {typeof pr.quality_score === "number" ? `${pr.quality_score.toFixed(2)}%` : pr.quality_score}
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pr.metrics ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {Object.entries(pr.metrics).map(([key, value]) =>
+                      renderMetricCard(key as keyof typeof metricLabels, value as number)
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No metrics available.</p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>
