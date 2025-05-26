@@ -22,7 +22,6 @@ import {
 } from "recharts";
 import { useSession } from "next-auth/react";
 import { analyzeRepository } from "@/lib/pr-analyze";
-import clsx from "clsx";
 
 const metricLabels = {
   cbo: "Coupling Between Objects",
@@ -62,7 +61,13 @@ function renderMetricCard(key: keyof typeof metricLabels, value: number) {
   );
 }
 
-export function SkillAssessment({ repoName, owner }: { repoName: string; owner: string }) {
+export function SkillAssessment({
+  repoName,
+  owner,
+}: {
+  repoName: string;
+  owner: string;
+}) {
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [pullRequests, setPullRequests] = useState<any[]>([]);
@@ -71,8 +76,14 @@ export function SkillAssessment({ repoName, owner }: { repoName: string; owner: 
     if (!session?.accessToken) return;
     setIsLoading(true);
     try {
-      const data = await analyzeRepository(session.accessToken, owner, repoName);
-      setPullRequests(Array.isArray(data?.pull_requests) ? data?.pull_requests : []);
+      const data = await analyzeRepository(
+        session.accessToken,
+        owner,
+        repoName
+      );
+      setPullRequests(
+        Array.isArray(data?.pull_requests) ? data?.pull_requests : []
+      );
     } catch (error) {
       console.error("Error fetching GitHub issues:", error);
     } finally {
@@ -142,31 +153,43 @@ export function SkillAssessment({ repoName, owner }: { repoName: string; owner: 
     );
   }
 
-const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-white/30 shadow-sm";
-
+  const cardClass =
+    "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-white/30 shadow-sm";
 
   return (
     <div className="space-y-10 px-4">
       <div className="text-left space-y-1">
-  <h2 className="text-4xl font-extrabold tracking-tight">Pull Request Analysis</h2>
-  <p className="text-muted-foreground text-lg">Visual insights into code quality and complexity trends</p>
-</div>
+        <h2 className="text-4xl font-extrabold tracking-tight">
+          Pull Request Analysis
+        </h2>
+        <p className="text-muted-foreground text-lg">
+          Visual insights into code quality and complexity trends
+        </p>
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <Card className={cardClass}>
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2"><GitPullRequest /> Analysis Coverage</CardTitle>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <GitPullRequest /> Analysis Coverage
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-5xl font-bold text-center">{analyzedPRs.length}/{pullRequests.length}</div>
-            <p className="text-center text-muted-foreground mt-1">Pull Requests Analyzed</p>
+            <div className="text-5xl font-bold text-center">
+              {analyzedPRs.length}/{pullRequests.length}
+            </div>
+            <p className="text-center text-muted-foreground mt-1">
+              Pull Requests Analyzed
+            </p>
           </CardContent>
         </Card>
 
         {qualityDistribution.length > 0 && (
           <Card className={`md:col-span-2 ${cardClass}`}>
             <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2"><Activity /> Quality Distribution</CardTitle>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Activity /> Quality Distribution
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={200}>
@@ -183,7 +206,12 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`${Math.round(value as number)}%`, "Percentage"]} />
+                  <Tooltip
+                    formatter={(value) => [
+                      `${Math.round(value as number)}%`,
+                      "Percentage",
+                    ]}
+                  />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -194,8 +222,12 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
 
       <Card className={cardClass}>
         <CardHeader>
-          <CardTitle className="text-xl flex items-center gap-2"><LineChart /> Quality Trends</CardTitle>
-          <CardDescription>Track how quality and complexity change over time</CardDescription>
+          <CardTitle className="text-xl flex items-center gap-2">
+            <LineChart /> Quality Trends
+          </CardTitle>
+          <CardDescription>
+            Track how quality and complexity change over time
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -205,8 +237,18 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="quality" stroke="#10b981" name="Quality Score" />
-              <Line type="monotone" dataKey="complexity" stroke="#f59e0b" name="Complexity" />
+              <Line
+                type="monotone"
+                dataKey="quality"
+                stroke="#10b981"
+                name="Quality Score"
+              />
+              <Line
+                type="monotone"
+                dataKey="complexity"
+                stroke="#f59e0b"
+                name="Complexity"
+              />
             </RechartsLineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -214,9 +256,34 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
 
       {averageMetrics && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className={cardClass}><CardHeader><CardTitle>💻 Average Lines of Code</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.loc}</div></CardContent></Card>
-          <Card className={cardClass}><CardHeader><CardTitle>📈 Average Complexity</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.complexity}</div></CardContent></Card>
-          <Card className={cardClass}><CardHeader><CardTitle>📎 Average Variables</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold">{averageMetrics.variables}</div></CardContent></Card>
+          <Card className={cardClass}>
+            <CardHeader>
+              <CardTitle>💻 Average Lines of Code</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{averageMetrics.loc}</div>
+            </CardContent>
+          </Card>
+          <Card className={cardClass}>
+            <CardHeader>
+              <CardTitle>📈 Average Complexity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {averageMetrics.complexity}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className={cardClass}>
+            <CardHeader>
+              <CardTitle>📎 Average Variables</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {averageMetrics.variables}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -226,10 +293,15 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
           {analyzedPRs.map((pr) => (
             <Card key={pr.pr_number} className={cardClass}>
               <CardHeader>
-                <CardTitle className="text-xl font-bold">PR #{pr.pr_number}: {pr.title}</CardTitle>
+                <CardTitle className="text-xl font-bold">
+                  PR #{pr.pr_number}: {pr.title}
+                </CardTitle>
                 <CardDescription>
-                  Quality Score: <span className="font-bold">
-                    {typeof pr.quality_score === "number" ? `${pr.quality_score.toFixed(2)}%` : pr.quality_score}
+                  Quality Score:{" "}
+                  <span className="font-bold">
+                    {typeof pr.quality_score === "number"
+                      ? `${pr.quality_score.toFixed(2)}%`
+                      : pr.quality_score}
                   </span>
                 </CardDescription>
               </CardHeader>
@@ -237,7 +309,10 @@ const cardClass = "p-3 bg-muted/40 rounded-md border-2 border-white dark:border-
                 {pr.metrics ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {Object.entries(pr.metrics).map(([key, value]) =>
-                      renderMetricCard(key as keyof typeof metricLabels, value as number)
+                      renderMetricCard(
+                        key as keyof typeof metricLabels,
+                        value as number
+                      )
                     )}
                   </div>
                 ) : (
