@@ -27,7 +27,7 @@ const formatDate = (dateString: string) => {
 };
 
 // Language color map
-const languageColors: Record<string, string> = {
+export const languageColors: Record<string, string> = {
   JavaScript: "bg-yellow-400",
   TypeScript: "bg-blue-500",
   Python: "bg-green-500",
@@ -58,7 +58,9 @@ export function RepositoryCard({ repository }: RepositoryCardProps) {
             </CardTitle>
             {repository.private ? (
               <Badge variant="outline">Private</Badge>
-            ) : null}
+            ) : (
+              <Badge variant="outline">Public</Badge>
+            )}
           </div>
           <CardDescription className="line-clamp-2 h-10">
             {repository.description || "No description provided"}

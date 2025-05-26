@@ -61,23 +61,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col space-y-1">
           <p className="text-sm font-medium text-muted-foreground mb-2">
             {currentRepo ? (
-  <div className="mb-4">
-    <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
-      Repository
-    </p>
-    <div className="text-base font-semibold text-white truncate">
-      {decodeURIComponent(currentRepo)}
-    </div>
-  </div>
-) : (
-  <div className="mb-4">
-    <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
-      Repository
-    </p>
-    <div className="text-sm text-gray-400">Not selected</div>
-  </div>
-)}
-
+              <div className="mb-4">
+                <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
+                  Repository
+                </p>
+                <div className="text-base font-semibold text-white truncate">
+                  {decodeURIComponent(currentRepo)}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4">
+                <p className="text-xs uppercase text-gray-400 tracking-wider mb-1">
+                  Repository
+                </p>
+                <div className="text-sm text-gray-400">Not selected</div>
+              </div>
+            )}
           </p>
 
           {DASHBOARD_SECTIONS.map((section) => (
@@ -91,7 +90,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               className={cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
                 currentSection === section.id
-                  ? "bg-accent text-accent-foreground"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
                   : "text-foreground"
               )}
               onClick={(e) => {

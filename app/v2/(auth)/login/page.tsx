@@ -64,7 +64,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-xs text-center text-gray-500 dark:text-gray-400">
-          By continuing, you agree to GitManager&apos;s Terms of Service and
+          By continuing, you agree to Vortexa&apos;s Terms of Service and
           Privacy Policy
         </div>
       </div>

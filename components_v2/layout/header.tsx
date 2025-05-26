@@ -3,7 +3,6 @@
 import { useSession, signOut } from "next-auth/react";
 import { ThemeToggle } from "@/components_v2/ui/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components_v2/ui/avatar";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,10 +40,12 @@ export function Header({ toggleSidebar }: HeaderProps) {
               <Menu className="h-5 w-5" />
             </Button>
           )}
-          <Link href="/" className="flex items-center gap-2">
-            <GitHubLogoIcon className="h-6 w-6" />
-            <span className="font-semibold text-xl hidden sm:inline-block">
-              Vortexa
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold">V</span>
+            </div>
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+              VORTEXA
             </span>
           </Link>
         </div>
@@ -83,7 +84,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/repositories">My Repositories</Link>
+                  <Link href="/v2/repositories">My Repositories</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"

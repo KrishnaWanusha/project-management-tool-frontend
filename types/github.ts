@@ -49,6 +49,7 @@ export interface User {
 export interface Issue {
   id: number;
   title: string;
+  state: string;
   body: string;
   labels: Label[];
   created_at: string;
