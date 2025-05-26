@@ -1,8 +1,10 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Live demo: https://vortexa.ugg-roleplay.com
 
-## Available Scripts
+## Getting Started
+
+First, run the development server :
 
 In the project directory, you can run:
 
