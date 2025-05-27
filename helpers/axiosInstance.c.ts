@@ -10,7 +10,8 @@ export function clearInstance() {
 export default function axiosInstance() {
   if (instance) return instance;
 
-  const baseURL = process.env.NEXT_PUBLIC_API_HOST ?? "http://localhost:4001/";
+  const baseURL =
+    process.env.NEXT_PUBLIC_BACKEND_API ?? "http://localhost:4001/";
   const headers: { [key: string]: string } = {};
 
   const u = loadLocalStorage<LoginResponse | undefined>("authUser");
