@@ -451,10 +451,10 @@ export function RiskAssessment({
                   </div>
                   <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                     Confidence:{" "}
-                    {issues[selectedTaskIndex].confidence
-                      ? `${(issues[selectedTaskIndex].confidence * 100).toFixed(
-                          0
-                        )}%`
+                    {issues?.[selectedTaskIndex]?.confidence
+                      ? `${(
+                          (issues?.[selectedTaskIndex]?.confidence ?? 1) * 100
+                        ).toFixed(0)}%`
                       : "N/A"}
                   </div>
                 </motion.div>
@@ -505,7 +505,8 @@ export function RiskAssessment({
                     {issues[selectedTaskIndex].difference !== undefined && (
                       <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                         Difference:{" "}
-                        {issues[selectedTaskIndex].difference.toFixed(1)} points
+                        {issues?.[selectedTaskIndex]?.difference?.toFixed(1)}{" "}
+                        points
                       </div>
                     )}
                   </div>

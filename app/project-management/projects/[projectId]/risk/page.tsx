@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import FileUploader from "./storyPointFileUploader";
-import TaskList from "./taskList";
 import axiosInstance from "../../../../../helpers/axiosInstance.c";
 
 // Interface for task data
@@ -89,24 +88,6 @@ export default function StoryEstimateHomePage() {
 
     // Hide past stories if they were showing
     setShowPastStories(false);
-  };
-
-  // Handle task update from TaskList
-  const handleUpdateTask = (index: number, updatedTask: Task) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index] = updatedTask;
-    setTasks(updatedTasks);
-
-    // Show success notification
-    setNotification({
-      type: "success",
-      message: "Team estimate updated successfully",
-    });
-
-    // Clear notification after 3 seconds
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
   };
 
   // Process past stories to ensure they have risk assessment data
@@ -549,7 +530,7 @@ export default function StoryEstimateHomePage() {
                 </div>
               )
             ) : (
-              <TaskList tasks={tasks} onUpdateTask={handleUpdateTask} />
+              <div></div>
             )}
           </div>
         </>

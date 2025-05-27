@@ -19,7 +19,7 @@ export const getPriorityFromLabels = (labels: Label[]): Priority => {
 };
 
 export default function IssueCard({ issue }: { issue: Issue }) {
-  const priority = getPriorityFromLabels(issue.labels);
+  const priority = getPriorityFromLabels(issue?.labels ?? []);
   const isClosed = issue.state === "closed";
 
   return (
@@ -62,7 +62,7 @@ export default function IssueCard({ issue }: { issue: Issue }) {
             </div>
             <p className="text-sm text-muted-foreground">{issue.body}</p>
             <div className="flex flex-wrap gap-2 mt-2">
-              {issue.labels.map((label) => (
+              {issue?.labels?.map((label) => (
                 <Badge
                   key={label.id}
                   variant="outline"
@@ -80,18 +80,18 @@ export default function IssueCard({ issue }: { issue: Issue }) {
             <div className="flex justify-between items-center pt-2 mt-2 border-t">
               <div className="flex items-center gap-2">
                 <img
-                  src={issue.user.avatar_url}
-                  alt={issue.user.login}
+                  src={issue?.user?.avatar_url}
+                  alt={issue?.user?.login}
                   className="w-6 h-6 rounded-full"
                 />
                 <span className="text-sm text-muted-foreground">
-                  {issue.user.login}
+                  {issue?.user?.login}
                 </span>
               </div>
               <div className="flex gap-4 items-center text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  {formatDate(issue.created_at)}
+                  {issue?.created_at ? formatDate(issue?.created_at) : "N/A"}
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageSquare className="h-3 w-3" />
