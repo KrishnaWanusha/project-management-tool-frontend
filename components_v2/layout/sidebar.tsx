@@ -47,8 +47,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          "fixed top-16 bottom-0 left-0 z-50 w-64 border-r border-border bg-background p-4 transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:z-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          "sticky top-16 left-0 z-50 w-64 h-[calc(100vh-4rem)] border-r border-border bg-background p-4 transition-transform duration-200 ease-in-out",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          "md:translate-x-0 md:sticky"
         )}
       >
         <div className="flex items-center justify-between mb-6 md:hidden">

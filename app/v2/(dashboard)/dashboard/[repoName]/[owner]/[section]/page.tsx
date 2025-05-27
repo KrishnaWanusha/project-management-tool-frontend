@@ -8,6 +8,7 @@ import { TaskCreation } from "@/components_v2/sections/task-creation";
 import { RiskAssessment } from "@/components_v2/sections/risk-assessment";
 import { SkillAssessment } from "@/components_v2/sections/skill-assessment";
 import { DashboardSection } from "@/types/github";
+import { useIssues } from "../dashboard.context";
 
 function DashboardPage({
   params,
@@ -17,6 +18,7 @@ function DashboardPage({
   const { status } = useSession();
   const router = useRouter();
   const { owner, section } = params;
+  const { issues, isLoading, fetchIssues } = useIssues();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -29,9 +31,15 @@ function DashboardPage({
       case "document-generation":
         return <DocumentGeneration />;
       case "task-creation":
-        return <TaskCreation repoName={params.repoName} owner={owner} />;
+        return <TaskCreation issues={issues} isLoading={isLoading} />;
       case "risk-assessment":
-        return <RiskAssessment />;
+        return (
+          <RiskAssessment
+            issues={issues}
+            isLoading={isLoading}
+            fetchIssues={fetchIssues}
+          />
+        );
       case "skill-assessment":
         return <SkillAssessment owner={owner} repoName={params.repoName} />;
       default:

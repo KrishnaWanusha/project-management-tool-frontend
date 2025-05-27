@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components_v2/ui/button";
 import { UploadIcon } from "lucide-react";
-import { getRepositoryIssues } from "@/lib/github";
-import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components_v2/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Issue, Priority } from "@/types/github";
@@ -22,45 +20,21 @@ import {
 const ITEMS_PER_PAGE = 5;
 
 export function TaskCreation({
-  repoName,
-  owner,
+  issues,
+  isLoading,
 }: {
-  repoName: string;
-  owner: string;
+  issues: Issue[];
+  isLoading: boolean;
 }) {
-  const { data: session } = useSession();
-  const [issues, setIssues] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const fetchIssues = useCallback(async () => {
-    if (!session?.accessToken) return;
-    setIsLoading(true);
-    try {
-      const data = await getRepositoryIssues(
-        session.accessToken,
-        owner,
-        repoName
-      );
-      setIssues(data);
-    } catch (error) {
-      console.error("Error fetching GitHub issues:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session?.accessToken, owner, repoName]);
-
-  useEffect(() => {
-    fetchIssues();
-  }, []);
 
   const filteredIssues = useMemo(() => {
     if (priorityFilter === "All") return issues;
     return issues.filter(
       (issue) =>
-        getPriorityFromLabels((issue as Issue)?.labels) === priorityFilter
+        getPriorityFromLabels((issue as Issue)?.labels ?? []) === priorityFilter
     );
   }, [issues, priorityFilter]);
 
@@ -72,13 +46,14 @@ export function TaskCreation({
   const totalPages = Math.ceil(filteredIssues.length / ITEMS_PER_PAGE);
 
   const highCount = issues.filter(
-    (issue) => getPriorityFromLabels((issue as Issue).labels) === "High"
+    (issue) => getPriorityFromLabels((issue as Issue)?.labels ?? []) === "High"
   ).length;
   const mediumCount = issues.filter(
-    (issue) => getPriorityFromLabels((issue as Issue).labels) === "Medium"
+    (issue) =>
+      getPriorityFromLabels((issue as Issue)?.labels ?? []) === "Medium"
   ).length;
   const lowCount = issues.filter(
-    (issue) => getPriorityFromLabels((issue as Issue).labels) === "Low"
+    (issue) => getPriorityFromLabels((issue as Issue)?.labels ?? []) === "Low"
   ).length;
   const openCount = issues.filter(
     (issue) => (issue as Issue).state === "open"

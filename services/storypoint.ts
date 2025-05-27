@@ -1,5 +1,6 @@
 "use client";
 
+import { Issue } from "@/types/github";
 import axiosInstance from "@helpers/axiosInstance.c";
 import { useApi } from "@helpers/global";
 import { AxiosResponse } from "axios";
@@ -26,7 +27,7 @@ interface Story {
 }
 
 interface StoryInput {
-  title: string;
+  title?: string;
   description?: string;
   teamEstimate?: number;
   projectId?: string;
@@ -171,12 +172,12 @@ const findOptimalInfluence = (
 };
 
 // Update team estimate
-const updateTeamEstimate = (storyId: string, teamEstimate: number) => {
+const updateTeamEstimate = (issue: Issue, teamEstimate: number) => {
   return axiosInstance().put<
     { storyId: string; teamEstimate: number },
     AxiosResponse<UpdateTeamEstimateResponse>
   >("/estimate/update-team-estimate", {
-    storyId,
+    issue,
     teamEstimate,
   });
 };
@@ -287,9 +288,9 @@ export const storyPointsApi = {
   },
 
   // Management functions
-  updateTeamEstimate: async (storyId: string, teamEstimate: number) => {
+  updateTeamEstimate: async (issue: Issue, teamEstimate: number) => {
     try {
-      const response = await updateTeamEstimate(storyId, teamEstimate);
+      const response = await updateTeamEstimate(issue, teamEstimate);
       return response.data;
     } catch (error) {
       console.error("Team estimate update error:", error);

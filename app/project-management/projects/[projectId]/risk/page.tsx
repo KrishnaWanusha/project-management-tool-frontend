@@ -1,7 +1,7 @@
 // src/app/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import FileUploader from "./storyPointFileUploader";
 import TaskList from "./taskList";
 import axiosInstance from "../../../../../helpers/axiosInstance.c";

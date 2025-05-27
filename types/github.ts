@@ -47,15 +47,28 @@ export interface User {
 }
 
 export interface Issue {
-  id: number;
-  title: string;
-  state: string;
-  body: string;
-  labels: Label[];
-  created_at: string;
-  comments: number;
-  user: User;
-  html_url: string;
+  id?: number;
+  title?: string;
+  state?: string;
+  body?: string;
+  labels?: Label[];
+  created_at?: string;
+  comments?: number;
+  user?: User;
+  html_url?: string;
+
+  // custom
+  githubId?: number;
+  repository?: string;
+  storyPoint?: number;
+  teamEstimate?: number;
+  confidence?: number;
+  fullAdjustment?: number;
+  appliedAdjustment?: number;
+  dqnInfluence?: number;
+  difference?: number;
+  comparisonStatus?: string;
+  riskLevel?: string;
 }
 
 export type Priority = "All" | "High" | "Medium" | "Low";
