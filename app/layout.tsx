@@ -7,8 +7,12 @@ import { ToastProvider } from "@/components_v2/ui/use-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ProjectHub - GitHub Project Management",
-  description: "Manage your GitHub projects with ease",
+  title: "Project Vortexa - Futuristic Project Management",
+  description:
+    "A futuristic project management platform with advanced features",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

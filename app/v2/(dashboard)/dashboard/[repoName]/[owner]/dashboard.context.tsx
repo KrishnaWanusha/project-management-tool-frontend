@@ -108,8 +108,10 @@ export const IssuesProvider = ({
   }, [session?.accessToken, owner, repoName]);
 
   useEffect(() => {
-    fetchIssues();
-  }, []);
+    if (session?.accessToken) {
+      fetchIssues();
+    }
+  }, [session?.accessToken, fetchIssues]);
 
   return (
     <IssuesContext.Provider

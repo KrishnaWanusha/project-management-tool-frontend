@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components_v2/ui/button";
+import { useEffect, useState } from "react";
 
 const sectionIcons = {
   "document-generation": <FileText className="mr-2 h-4 w-4" />,
@@ -34,7 +35,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const currentRepo = params.repoName;
   const currentSection = params.section;
   const repoOwner = params.owner;
+  const [isMounted, setIsMounted] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
   return (
     <>
       {/* Mobile overlay */}
