@@ -6,7 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components_v2/ui/card";
-import { Activity, GitPullRequest, LineChart } from "lucide-react";
+import {
+  Activity,
+  GitPullRequest,
+  LineChart,
+  LaptopMinimal,
+  CodeXml,
+  SquareTerminal,
+} from "lucide-react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -171,7 +178,7 @@ export function SkillAssessment({
         <Card className={cardClass}>
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
-              <GitPullRequest /> Analysis Coverage
+              <GitPullRequest color="#e8e111" /> Analysis Coverage
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -188,7 +195,7 @@ export function SkillAssessment({
           <Card className={`md:col-span-2 ${cardClass}`}>
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
-                <Activity /> Quality Distribution
+                <Activity color="#e8e111" /> Quality Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -223,7 +230,7 @@ export function SkillAssessment({
       <Card className={cardClass}>
         <CardHeader>
           <CardTitle className="text-xl flex items-center gap-2">
-            <LineChart /> Quality Trends
+            <LineChart color="#1aea33" /> Quality Trends
           </CardTitle>
           <CardDescription>
             Track how quality and complexity change over time
@@ -258,7 +265,10 @@ export function SkillAssessment({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className={cardClass}>
             <CardHeader>
-              <CardTitle>💻 Average Lines of Code</CardTitle>
+              <CardTitle>
+                <CodeXml color="#4de538" className="mb-1" />
+                Average Lines of Code
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{averageMetrics.loc}</div>
@@ -266,7 +276,10 @@ export function SkillAssessment({
           </Card>
           <Card className={cardClass}>
             <CardHeader>
-              <CardTitle>📈 Average Complexity</CardTitle>
+              <CardTitle>
+                <LaptopMinimal color="#f5740a" className="mb-1" /> Average
+                Complexity
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
@@ -276,7 +289,10 @@ export function SkillAssessment({
           </Card>
           <Card className={cardClass}>
             <CardHeader>
-              <CardTitle>📎 Average Variables</CardTitle>
+              <CardTitle>
+                <SquareTerminal color="#4cb3e6" className="mb-1" />
+                Average Variables
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
