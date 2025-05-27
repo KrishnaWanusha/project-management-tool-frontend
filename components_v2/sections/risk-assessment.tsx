@@ -1,6 +1,13 @@
 "use client";
 import React, { useCallback, useMemo, useState } from "react";
-import { Shield, AlarmCheck, Code, Eye, Loader2 } from "lucide-react";
+import {
+  OctagonAlert,
+  TriangleAlert,
+  LayoutList,
+  Eye,
+  Loader2,
+  CircleCheckBig,
+} from "lucide-react";
 import { Issue } from "@/types/github";
 import storyPointsApi from "@services/storypoint";
 import { Button } from "../ui/button";
@@ -251,7 +258,7 @@ export function RiskAssessment({
           <div className="p-6">
             <div className="mb-4">
               <h3 className="text-lg font-semibold dark:text-white">
-                Overall Risk Score
+                Risk Summary
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Based on repository analysis
@@ -260,7 +267,10 @@ export function RiskAssessment({
 
             <div className="grid grid-cols-5 sm:grid-cols-5 gap-4">
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-card transition-all hover:shadow-md">
-                <Shield className="h-6 w-6 mb-2 text-orange-500" />
+                <OctagonAlert
+                  className="h-6 w-6 mb-2 text-orange-500"
+                  color="#9a0404"
+                />
                 <div className="text-sm font-medium dark:text-white">
                   High Risk Tasks
                 </div>
@@ -270,7 +280,10 @@ export function RiskAssessment({
               </div>
 
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-card transition-all hover:shadow-md">
-                <AlarmCheck className="h-6 w-6 mb-2 text-green-500" />
+                <TriangleAlert
+                  className="h-6 w-6 mb-2 text-green-500"
+                  color="#eb510f"
+                />
                 <div className="text-sm font-medium dark:text-white">
                   Medium Risk Tasks
                 </div>
@@ -280,7 +293,10 @@ export function RiskAssessment({
               </div>
 
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-card transition-all hover:shadow-md">
-                <Code className="h-6 w-6 mb-2 text-blue-500" />
+                <TriangleAlert
+                  className="h-6 w-6 mb-2 text-blue-500"
+                  color="#e0e413"
+                />
                 <div className="text-sm font-medium dark:text-white">
                   Low Risk Tasks
                 </div>
@@ -290,7 +306,10 @@ export function RiskAssessment({
               </div>
 
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-card transition-all hover:shadow-md">
-                <Code className="h-6 w-6 mb-2 text-blue-500" />
+                <CircleCheckBig
+                  className="h-6 w-6 mb-2 text-blue-500"
+                  color="#1dc217"
+                />
                 <div className="text-sm font-medium dark:text-white">
                   Accurate Estimates
                 </div>
@@ -300,7 +319,10 @@ export function RiskAssessment({
               </div>
 
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-card transition-all hover:shadow-md">
-                <Code className="h-6 w-6 mb-2 text-blue-500" />
+                <LayoutList
+                  className="h-6 w-6 mb-2 text-blue-500"
+                  color="#29afec"
+                />
                 <div className="text-sm font-medium dark:text-white">
                   Not Estimated
                 </div>
