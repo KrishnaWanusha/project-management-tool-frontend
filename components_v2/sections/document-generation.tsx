@@ -1,3 +1,5 @@
+"use client";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -13,8 +15,24 @@ import {
   TabsTrigger,
 } from "@/components_v2/ui/tabs";
 import { FileIcon, FileTextIcon, FileCodeIcon } from "lucide-react";
+import { useGetMeetings } from "@services/meeting"; 
+import CreateMeetingModal from "../../components_v2/createMeeting"; 
+import {
+  EyeSlashIcon,
+  ChevronUpDownIcon,
+  AdjustmentsHorizontalIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
+import MeetingCard from "@/components_v2/meetingCard"; 
+import ButtonComponent from "@components/button.component";
+import moment from 'moment';
+
 
 export function DocumentGeneration() {
+   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const { data: state, loading, mutate } = useGetMeetings(); // Change to useGetMeetings
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
@@ -26,14 +44,18 @@ export function DocumentGeneration() {
         </p>
       </div>
 
+       <ButtonComponent
+            title="New Meeting"
+            icon={<PlusIcon />}
+            onClick={() => setIsCreateModalOpen(true)}
+      />
+
       <Tabs defaultValue="readme" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="readme">README</TabsTrigger>
-          <TabsTrigger value="api">API Docs</TabsTrigger>
-          <TabsTrigger value="contribute">Contributing</TabsTrigger>
+          <TabsTrigger value="home">Home</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="readme" className="space-y-4">
+        <TabsContent value="home" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>README Generator</CardTitle>
@@ -43,95 +65,40 @@ export function DocumentGeneration() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-muted/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Basic</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <FileIcon className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Simple project overview</span>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        Generate
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-muted/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Standard</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <FileTextIcon className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Detailed documentation</span>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        Generate
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-muted/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Advanced</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <FileCodeIcon className="h-4 w-4 mr-2" />
-                        <span className="text-sm">With code examples</span>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        Generate
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+              {loading ? (
+          <div className="h-screen flex items-center justify-center">
+            <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-gray-600" />
+          </div>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {state?.meetings
+              ?.slice()
+              .sort((a, b) =>
+                moment((b as any).createdAt).isAfter(
+                  moment((a as any).createdAt)
+                )
+                  ? 1
+                  : -1
+              )
+              .map((meeting) => (
+                <MeetingCard key={meeting.displayId} meeting={meeting} />
+              ))}
+          </div>
+        )}
+         <CreateMeetingModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            mutate(); // Refresh the meeting list after a new meeting is created
+          }}
+          />
               </div>
-              <Button className="w-full">Custom README</Button>
+             
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="api" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>API Documentation</CardTitle>
-              <CardDescription>
-                Generate API documentation from your codebase
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Select options and generate comprehensive API documentation
-              </p>
-              <Button className="w-full">Generate API Documentation</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="contribute" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contributing Guidelines</CardTitle>
-              <CardDescription>
-                Create guidelines for project contributors
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Generate standard contributing guidelines for your project
-              </p>
-              <Button className="w-full">
-                Generate Contributing Guidelines
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
