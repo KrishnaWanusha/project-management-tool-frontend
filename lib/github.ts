@@ -109,3 +109,44 @@ export async function createRepositoryLabel(
   if (!res.ok) throw new Error(`Error creating label: ${res.status}`);
   return res.json();
 }
+export async function createBulkIssues(
+  accessToken: string,
+  owner: string,
+  repo: string,
+  issues: Array<{
+    title: string;
+    body?: string;
+    labels?: string[];
+    assignees?: string[];
+  }>
+) {
+  try {
+    const results = await Promise.all(
+      issues.map(async (issue) => {
+        const response = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/issues`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `token ${accessToken}`,
+              Accept: "application/vnd.github.v3+json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(issue),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`GitHub API error: ${response.status}`);
+        }
+
+        return await response.json();
+      })
+    );
+
+    return results;
+  } catch (error) {
+    console.error("Failed to create issues:", error);
+    return [];
+  }
+}

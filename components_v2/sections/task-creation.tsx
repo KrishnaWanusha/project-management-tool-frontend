@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components_v2/ui/button";
-import { UploadIcon } from "lucide-react";
+import { Settings, UploadIcon } from "lucide-react";
 import { Skeleton } from "@/components_v2/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Issue, Priority } from "@/types/github";
 import IssueCard, { getPriorityFromLabels } from "../issue-card";
 import { AnimatePresence } from "framer-motion";
 import FileUploadModal from "../ui/file-upload";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   AlertTriangle,
@@ -16,6 +17,11 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
+import { uploadSRSFile } from "@services/issues";
+import Modal from "../ui/modal";
+import { useSession } from "next-auth/react";
+import { createBulkIssues } from "@/lib/github";
+import { useParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -26,9 +32,18 @@ export function TaskCreation({
   issues: Issue[];
   isLoading: boolean;
 }) {
+  const { data: session } = useSession();
+  const params = useParams();
+  const owner = params.owner as string;
+  const repoName = params.repoName as string;
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [step, setStep] = useState(0);
+  const [editableTasks, setEditableTasks] = useState<
+    { title: string; body: string }[]
+  >([]);
 
   const filteredIssues = useMemo(() => {
     if (priorityFilter === "All") return issues;
@@ -94,6 +109,128 @@ export function TaskCreation({
       color: "gray",
     },
   ];
+
+  const onUpload = useCallback(async (file: File) => {
+    try {
+      setStep(1);
+      const response = await uploadSRSFile(file);
+      if (response?.data?.tasks?.length > 0) {
+        setStep(2);
+        setEditableTasks(
+          response?.data?.tasks?.map((m) => ({
+            title: m.requirement,
+            body: m.tasks?.join("\n"),
+          }))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      setStep(0);
+    }
+  }, []);
+
+  const renderModalContent = () => {
+    switch (step) {
+      case 0:
+        return (
+          <FileUploadModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onUpload={onUpload}
+          />
+        );
+      case 1:
+        return (
+          <div className="flex flex-col items-center justify-center py-10 space-y-4">
+            <motion.div
+              animate={{
+                rotate: 360,
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              <Settings className="h-10 w-10 text-blue-500" />
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-sm text-gray-500"
+            >
+              Processing uploaded file...
+            </motion.p>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6 mt-4">
+            <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
+              {editableTasks.map((task, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="p-4 border rounded-lg shadow bg-white dark:bg-gray-900"
+                >
+                  <input
+                    value={task.title}
+                    onChange={(e) => {
+                      const newTasks = [...editableTasks];
+                      newTasks[idx].title = e.target.value;
+                      setEditableTasks(newTasks);
+                    }}
+                    className="w-full font-semibold text-lg mb-2 bg-transparent outline-none"
+                  />
+                  <textarea
+                    value={task.body}
+                    onChange={(e) => {
+                      const newTasks = [...editableTasks];
+                      newTasks[idx].body = e.target.value;
+                      setEditableTasks(newTasks);
+                    }}
+                    className="w-full text-sm resize-none bg-transparent outline-none"
+                    rows={4}
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="flex justify-center items-center">
+              <Button
+                variant="gradient"
+                onClick={async () => {
+                  try {
+                    if (!session?.accessToken) return;
+                    const res = await createBulkIssues(
+                      session?.accessToken,
+                      owner,
+                      repoName,
+                      editableTasks
+                    );
+                    if (res) {
+                      setStep(0);
+                      setIsModalOpen(false);
+                      setEditableTasks([]);
+                    }
+                  } catch (err) {
+                    console.error("GitHub task creation failed", err);
+                  }
+                }}
+              >
+                Submit to GitHub
+              </Button>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -166,17 +303,11 @@ export function TaskCreation({
 
       <AnimatePresence>
         {isModalOpen && (
-          <FileUploadModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onUpload={() => {
-              // Handle successful upload
-              console.log("File uploaded successfully");
-            }}
-          />
+          <Modal onClose={() => setIsModalOpen(false)}>
+            {renderModalContent()}
+          </Modal>
         )}
       </AnimatePresence>
-
       <div className="space-y-4">
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => (
